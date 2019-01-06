@@ -1,6 +1,7 @@
 #pragma once
 #include "Map.h"
-
+#include <random>
+#include <cmath>
 class MapBuilder
 {
 public:
@@ -30,51 +31,54 @@ public:
 				m_map[i][j] = emptyField;
 			}
 		}
-	}
-	void generateStart()
+	}*/
+	template<typename MapT, typename mapType>
+	static void generateStart(MapT& map)
 	{
-		/*
+		
 		// Seed with a real random value, if available
 		std::random_device r;
 
 		// Choose a random mean between 1 and 6
 		std::default_random_engine e1(r());
-		std::uniform_int_distribution<int> uniform_dist_width(0, m_width - 1);
-		m_start_x = uniform_dist_width(e1);
-		if (m_start_x == 0 || m_start_x == m_width - 1)
+		std::uniform_int_distribution<int> uniform_dist_width(0, map.getWidth()- 1);
+		Field<mapType> start;
+		start.value = 'S';
+		start.x = uniform_dist_width(e1);
+		if (start.x == 0 || start.x == map.getWidth() - 1)
 		{
-			std::uniform_int_distribution<int> uniform_dist_height(0, m_heigth - 1);
+			std::uniform_int_distribution<int> uniform_dist_height(0, map.getHeight() - 1);
 
-			m_start_y = uniform_dist_height(e1);
+			start.y = uniform_dist_height(e1);
 		}
 		else
 		{
 			std::uniform_int_distribution<int> uniform_dist_height(0, 1);
 
-			m_start_y = uniform_dist_height(e1);
+			start.y = uniform_dist_height(e1);
 		}
+		std::cout << "m_start_x: " << start.x << '\n';
+		std::cout << "m_start_y: " << start.y << '\n';
+		//map.m_map[start.y][start.x] = start.value ;
 
-		//int meanHeight = uniform_dist_height(e1);
-
-
-		std::cout << "m_start_x: " << m_start_x << '\n';
-		std::cout << "m_start_y: " << m_start_y << '\n';
-
+		map.setStart(std::move(start));
+		
+		/*
 		m_end_x = uniform_dist_width(e1);
 		std::uniform_int_distribution<int> uniform_dist_height(0, m_heigth - 1);
 
 		m_end_y = uniform_dist_height(e1);
 
 		std::cout << "m_end_x: " << m_end_x << '\n';
-		std::cout << "m_end_x: " << m_end_y << '\n';
+		std::cout << "m_end_x: " << m_end_y << '\n';*/
 	}
-	*/
+	
 	template<typename MapT, typename mapType>
-	static void generateMap(MapT map)
+	static void generateMap(MapT& map)
 	{ 
 		static_assert(std::is_base_of<Map<mapType>, MapT>::value, "MapT must derive from Map");
 
-		//generateStart();
+		generateStart<MapT, mapType>(map);
 	}
 };
 

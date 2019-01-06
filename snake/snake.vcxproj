@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Field.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MapBuilder.h" />
     <ClInclude Include="pch.h" />
