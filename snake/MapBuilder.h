@@ -32,8 +32,8 @@ public:
 			}
 		}
 	}*/
-	template<typename MapT, typename mapType>
-	static void generateStart(MapT& map)
+	template<typename FieldType>
+	static void generateStart(Map<FieldType>& map)
 	{
 		
 		// Seed with a real random value, if available
@@ -42,7 +42,7 @@ public:
 		// Choose a random mean between 1 and 6
 		std::default_random_engine e1(r());
 		std::uniform_int_distribution<int> uniform_dist_width(0, map.getWidth()- 1);
-		Field<mapType> start;
+		FieldType start;
 		start.value = 'S';
 		start.x = uniform_dist_width(e1);
 		if (start.x == 0 || start.x == map.getWidth() - 1)
@@ -73,12 +73,10 @@ public:
 		std::cout << "m_end_x: " << m_end_y << '\n';*/
 	}
 	
-	template<typename MapT, typename mapType>
-	static void generateMap(MapT& map)
+	template<typename FieldType>
+	static void generateMap(Map<FieldType>& map)
 	{ 
-		static_assert(std::is_base_of<Map<mapType>, MapT>::value, "MapT must derive from Map");
-
-		generateStart<MapT, mapType>(map);
+		generateStart(map);
 	}
 };
 
