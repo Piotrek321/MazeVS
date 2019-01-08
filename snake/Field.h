@@ -3,8 +3,9 @@
 template<typename T>
 struct Field
 {
-	int x;
-	int y;
+ 
+	int x =0;
+	int y =0;
 	T value;
 
 };
