@@ -27,10 +27,10 @@ public:
 	FieldType getStart() const;
 	FieldType getEnd() const;
 
-	template<typename T>
+	template<typename T = FieldType>
 	void setStart(T&& start);
 
-	template<typename T>
+	template<typename T = FieldType>
 	void setEnd(T&& end);
 
 	int getHeight() const;
