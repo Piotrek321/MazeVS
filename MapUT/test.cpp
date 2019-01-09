@@ -12,8 +12,8 @@ namespace
 }
 
 TEST(MapUT, TestCreatingMapGetters)
-{/*
-	Map<char> map{ height ,width, '#' };
+{
+	Map<Field> map{ height ,width, '#' };
 	auto board = std::vector< std::vector<decltype(border)>>(height, std::vector<decltype(border)>(width, border));
 
 	testing::internal::CaptureStdout();
@@ -33,7 +33,7 @@ TEST(MapUT, TestCreatingMapGetters)
 
 	EXPECT_EQ(realOutput, expectedOutput);
 	EXPECT_EQ(width, map.getWidth());
-	EXPECT_EQ(height, map.getHeight());*/
+	EXPECT_EQ(height, map.getHeight());
 	}
 
 TEST(MapUT, TestCreateEmptyMapThenSetStartAndVerifyItsPosition)
@@ -42,15 +42,9 @@ TEST(MapUT, TestCreateEmptyMapThenSetStartAndVerifyItsPosition)
 	Field field(startX, startY, '@');
 
 	map.setStart(field);
-	testing::internal::CaptureStdout();
-	std::cout << map;
-	std::string realOutput = testing::internal::GetCapturedStdout();
+	
+	auto fieldToBeVerified = map.getStart();
 
-	testing::internal::CaptureStdout();
-
-	std::string expectedOutput = testing::internal::GetCapturedStdout();
-
-	EXPECT_EQ(realOutput, expectedOutput);
-	EXPECT_EQ(width, map.getWidth());
-	EXPECT_EQ(height, map.getHeight());
+	EXPECT_EQ(field.x, fieldToBeVerified.x);
+	EXPECT_EQ(field.y, fieldToBeVerified.y);
 }

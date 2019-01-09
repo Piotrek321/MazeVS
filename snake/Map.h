@@ -17,7 +17,7 @@ public:
 		{
 			for (const auto & cell : row)
 			{
-				os << cell;
+				os << cell.value;
 			}
 			os << "\n";
 		}
@@ -36,7 +36,7 @@ public:
 	int getHeight() const;
 	int getWidth() const;
 
-	std::vector< std::vector<char>> m_board;
+	std::vector<std::vector<FieldType>> m_board;
 
 private:
 
@@ -51,8 +51,24 @@ template<typename FieldType>
 Map<FieldType>::Map(int height, int width, char border) :m_heigth(height), m_width(width), m_border(border)
 {
 	static_assert(std::is_base_of<FieldType, Field>::value, "FieldType must derive from Field");
-	m_board = std::vector< std::vector<char>>(height, std::vector<char>(width, m_border));
+
+	m_board = std::vector< std::vector<FieldType>>(height, std::vector<FieldType>(width, FieldType(m_border)));
+	for (int i =0; i<width; ++i)
+	{
+		for (int j = 0; j < height; ++j)
+		{
+			if (j == 0 || i == 0 || j == height - 1 || i == width - 1)
+			{
+				m_board[j][i].isBorder = true;
+				m_board[j][i].value = 'X';
+			}
+			m_board[j][i].x = i;
+			m_board[j][i].y = j;
+		}
+	}
+
 }
+
 template<typename FieldType>
 void Map<FieldType>::printMap()
 {
