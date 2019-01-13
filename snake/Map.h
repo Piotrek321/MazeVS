@@ -72,14 +72,22 @@ Map<FieldType>::Map(int height, int width, char border) :m_heigth(height), m_wid
 template<typename FieldType>
 void Map<FieldType>::printMap()
 {
-	for (const auto & row : m_board)
+	for (int j = 0; j < m_heigth; ++j)
+	{
+		for (int i = 0; i < m_width; ++i)
+		{
+			std::cout  << m_board[j][i].value;
+		}
+		std::cout << "\n";
+	}
+	/*for (const auto & row : m_board)
 	{
 		for (const auto & cell : row)
 		{
 			std::cout << cell;
 		}
 		std::cout << "\n";
-	}
+	}*/
 }
 
 template<typename FieldType>
