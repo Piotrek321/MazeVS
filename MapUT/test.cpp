@@ -39,7 +39,7 @@ TEST(MapUT, TestCreatingMapGetters)
 		{
 			std::cout << field.value;
 		}
-		std::cout << "\n";
+		std::cout << std::endl;
 	}
 	std::string expectedOutput = testing::internal::GetCapturedStdout();
 
@@ -76,16 +76,16 @@ TEST(MapBuilderUT, TestCreateEmptyMapThenSetStartAndVerifyItsPositionXis2Yis1)
 	Field &rightField = map.m_board[1][3];
 
 	auto availableFields = MapBuilder::lookAround(map, field);
-	std::cout << "&leftField: " <<  &leftField << "\n";
-	std::cout << "downField: " << &downField << "\n";
+	std::cout << "&leftField: " << &leftField << std::endl;
+	std::cout << "downField: " << &downField << std::endl;
 
-	std::cout <<"&availableFields[0].get(): "<< &availableFields[0].get()<< "\n";
-	std::cout << "&availableFields[1].get(): " << &availableFields[1].get() << "\n";
+	std::cout <<"&availableFields[0].get(): "<< &availableFields[0].get()<< std::endl;
+	std::cout << "&availableFields[1].get(): " << &availableFields[1].get() << std::endl;
 
- EXPECT_EQ(&availableFields[0].get(), &downField);
- EXPECT_EQ(&availableFields[1].get(), &leftField);
- EXPECT_EQ(&availableFields[2].get(), &rightField);
-
+	EXPECT_EQ(availableFields.size(), 3);
+    EXPECT_EQ(&availableFields[0].get(), &downField);
+    EXPECT_EQ(&availableFields[1].get(), &leftField);
+	EXPECT_EQ(&availableFields[2].get(), &rightField);
 }
 
 TEST(MapBuilderUT, TestCreateEmptyMapThenSetStartAndVerifyItsPositionX0YIs0)
@@ -109,6 +109,8 @@ TEST(MapBuilderUT, TestCreateEmptyMapThenSetStartAndVerifyItsPositionX1YIs1)
 	
 	EXPECT_EQ(&availableFields[0].get(), &downField);
 	EXPECT_EQ(&availableFields[1].get(), &rightField);
+	EXPECT_EQ(availableFields.size(), 2);
+
 }
 
 TEST(MapBuilderUT, TestCreateEmptyMapThenSetStartAndVerifyItsPositionX18YIs1)
@@ -123,6 +125,8 @@ TEST(MapBuilderUT, TestCreateEmptyMapThenSetStartAndVerifyItsPositionX18YIs1)
 
 	EXPECT_EQ(&availableFields[0].get(), &downField);
 	EXPECT_EQ(&availableFields[1].get(), &rightField);
+	EXPECT_EQ(availableFields.size(), 2);
+
 }
 
 TEST(MapBuilderUT, TestCreateEmptyMapThenSetStartAndVerifyItsPositionX18YIs18)
@@ -137,6 +141,8 @@ TEST(MapBuilderUT, TestCreateEmptyMapThenSetStartAndVerifyItsPositionX18YIs18)
 
 	EXPECT_EQ(&availableFields[0].get(), &upField);
 	EXPECT_EQ(&availableFields[1].get(), &leftField);
+	EXPECT_EQ(availableFields.size(), 2);
+
 }
 
 TEST(MapBuilderUT, TestCreateEmptyMapThenSetStartAndVerifyItsPositionX2YIs2)
@@ -155,4 +161,28 @@ TEST(MapBuilderUT, TestCreateEmptyMapThenSetStartAndVerifyItsPositionX2YIs2)
 	EXPECT_EQ(&availableFields[1].get(), &downField);
 	EXPECT_EQ(&availableFields[2].get(), &leftField);
 	EXPECT_EQ(&availableFields[3].get(), &rightField);
+	EXPECT_EQ(availableFields.size(), 4);
+}
+
+TEST(MapBuilderUT, chooseRandomMove)
+{
+	Map<Field> map{ height ,width, border };
+	Field field{ 2, 2, '@' };
+
+	Field &upField = map.m_board[1][2];
+	Field &downField = map.m_board[3][2];
+	Field &leftField = map.m_board[2][1];
+	Field &rightField = map.m_board[2][3];
+
+	auto availableFields = MapBuilder::lookAround(map, field);
+	auto chosenField = MapBuilder::chooseRandomMove(availableFields);
+	if (&(*chosenField).get() == &availableFields[0].get() || &(*chosenField).get() == &availableFields[1].get() || &(*chosenField).get() == &availableFields[2].get() || &(*chosenField).get() == &availableFields[3].get())
+	{
+		EXPECT_TRUE(true);
+	}
+	else
+	{
+		EXPECT_TRUE(false);
+	}
+
 }
