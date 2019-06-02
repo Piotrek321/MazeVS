@@ -157,6 +157,7 @@
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MapBuilder.h" />
+    <ClInclude Include="Modifier.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>

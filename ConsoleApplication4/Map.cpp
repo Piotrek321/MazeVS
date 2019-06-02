@@ -1,5 +1,5 @@
 #include "Map.h"
-
+#include "Modifier.h"
 
 Map::Map(int height, int width) :m_heigth(height), m_width(width)
 {
@@ -13,7 +13,7 @@ Map::Map(int height, int width) :m_heigth(height), m_width(width)
 			if (j == 0 || i == 0 || j == height - 1 || i == width - 1)
 			{
 				m_board[j][i].isBorder = true;
-				m_board[j][i].value = 'X';
+				m_board[j][i].value = borderSign;
 			}
 			std::cout << "\n";
 			m_board[j][i].x = i;
@@ -30,7 +30,19 @@ void Map::printMap()
 	{
 		for (int i = 0; i < m_width; ++i)
 		{
-			std::cout << m_board[j][i].value;
+			if (startSign == m_board[j][i].value)
+			{
+				std::cout << m_board[j][i].value;
+				//std::cout << Color::FG_RED << m_board[j][i].value << Color::FG_DEFAULT;
+			}
+			else if (startSign == m_board[j][i].value)
+			{
+				std::cout << Color::FG_BLUE << m_board[j][i].value << Color::FG_DEFAULT;
+			}
+			else
+			{
+				std::cout << m_board[j][i].value;
+			}
 		}
 		std::cout << "\n";
 	}
@@ -59,9 +71,9 @@ void Map::setStart(Field && start)
 
 
 
-inline void Map::setEnd(Field && end)
+void Map::setEnd(Field  end)
 {
-	//m_end = end;
+	m_end = &m_board[end.y][end.x];
 }
 
 

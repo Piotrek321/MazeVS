@@ -39,7 +39,7 @@ ostream &operator << (ostream & os, const MapHandler& mh)
 
 int main()
 {
-	Map map{ 10, 20};
+	Map map{ 20, 30};
 	std::cout << map << "\n";
 	MapBuilder mapBuilder(map);
 	mapBuilder.generateMap();
