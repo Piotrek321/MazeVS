@@ -1,11 +1,12 @@
 #include "MapBuilder.h"
+#include "Logger.h"
 
 std::string MapBuilder::convertMoveToString(Moves move)
 {
 	return movesString[move];
 }
 
-Field * MapBuilder::makeMove(Field *& field, Moves where)
+Field * MapBuilder::makeMove(Field *& field, Moves where, bool addToStack)
 {
 	if (field != m_Map.getStart())
 	{
@@ -14,29 +15,11 @@ Field * MapBuilder::makeMove(Field *& field, Moves where)
 	m_Moves[where](field);
 	field->value = playerSign;
 	field->wasVisited = true;
-	m_FieldStack.push(field);
-	return field;
-}
-
-Field * MapBuilder::makeMove2(Field *& field, Moves where)
-{
-	if (field != m_Map.getStart())
+	if (addToStack)
 	{
-		field->value = emptyField;
+		m_FieldStack.push(field);
 	}
-	m_Moves[where](field);
-	field->value = playerSign;
-	field->wasVisited = true;
-	//m_FieldStack.push(field);
 	return field;
-}
-void MapBuilder::temp(Field *& field, Moves where)
-{
-
-	m_Moves[where](field);
-	field->value = playerSign;
-	field->wasVisited = true;
-	m_FieldStack.push(field);
 }
 
 void MapBuilder::initializeDirections()
@@ -49,10 +32,7 @@ void MapBuilder::initializeDirections()
 		{
 			return Moves::Up;
 		}
-		else
-		{
-			return boost::none;
-		}
+		return boost::none;
 	});
 
 	m_Directions.emplace_back([&map = this->m_Map](Field * field)->boost::optional<Moves>
@@ -61,10 +41,7 @@ void MapBuilder::initializeDirections()
 		{
 			return Moves::Down;
 		}
-		else
-		{
-			return boost::none;
-		}
+		return boost::none;
 	});
 
 	m_Directions.emplace_back([&map = this->m_Map](Field * field)->boost::optional<Moves>
@@ -73,10 +50,7 @@ void MapBuilder::initializeDirections()
 		{
 			return Moves::Left;
 		}
-		else
-		{
-			return boost::none;
-		}
+		return boost::none;
 	});
 
 	m_Directions.emplace_back([&map = this->m_Map](Field * field)->boost::optional<Moves>
@@ -85,10 +59,7 @@ void MapBuilder::initializeDirections()
 		{
 			return Moves::Right;
 		}
-		else
-		{
-			return boost::none;
-		}
+		return boost::none;
 	});
 }
 
@@ -129,12 +100,7 @@ MapBuilder::MapBuilder(Map &map) : m_Map(map)
 
 MapBuilder::Moves MapBuilder::chooseRandomDirection(std::vector<Moves> & availableMoves)
 {
-	// Seed with a real random value, if available
-	std::random_device r;
-
-	std::default_random_engine e1(r());
-	std::uniform_int_distribution<int> uniform_dist_width(0, availableMoves.size() - 1);
-	return availableMoves[uniform_dist_width(e1)];
+	return availableMoves[getRandomValue(availableMoves.size() - 1)];
 }
 
 //void  lookAround();//const Map& map, const FieldType& field);
@@ -143,143 +109,124 @@ MapBuilder::Moves MapBuilder::chooseRandomDirection(std::vector<Moves> & availab
 // i.e vector<optional<TYPE>> . Beause now it is harder to test. You have to remeber what the output of fc will be
 auto MapBuilder::lookAround(Field* field)
 {
-	//std::vector<Field*> availableMoves;
 	std::vector<Moves> availableMoves;
-	std::cout << "Available moves:\n";
+	logging::print("Available moves:");
 
 	for (const auto & direction : m_Directions)
 	{
-		const auto direction_ = direction(field);
+		const auto & direction_ = direction(field);
 		if (direction_)
 		{
 			availableMoves.emplace_back(direction_.get());
-			std::cout << convertMoveToString(direction_.get()) << " ";
+			logging::print(convertMoveToString(direction_.get()) + " ");
 		}
 	}
+	logging::print("\n");
 
-	std::cout << "\n";
 	return availableMoves;
 }
 
-void MapBuilder::generate_(Map& map)
+void MapBuilder::pickRandomStart(Field * currentField)
 {
-	//LOOK AROUND
+	std::vector<Field*> fields;
+	for (auto & column : m_Map.m_board)
+	{
+		for (auto & field : column)
+		{
+			if (emptyField == field.value)
+			{
+				fields.emplace_back(&field);
+			}
+		}
+	}
+
+	fields[getRandomValue(fields.size() - 1)]->value = endSign;
+	currentField->value = emptyField;
+	m_Map.printMap();
 }
 
 void MapBuilder::generateMap()
 {
 	generateStart();
-	std::cout << m_Map << "\n";
+	logging::print(m_Map);
+
 	Field* currentField = m_Map.getStart();
 	currentField->wasVisited = true;
 	m_FieldStack.push(currentField);
-	while (1)
+
+	while (!m_FieldStack.empty())
 	{
 		auto availableFields = lookAround(currentField);
 
-		if (availableFields.size() == 0)
+		while (availableFields.size() == 0)
 		{
-
-			while (availableFields.size() == 0)
+			logging::print("No moves available. Current position is: " + currentField->toString());
+			if (m_FieldStack.size() == 2)
 			{
-				std::cout << "No moves available. Current position is: " << *currentField << "\n";
-				if (m_FieldStack.size() == 2)
-				{
-
-					std::vector<Field*> fields;
-					for (auto & column : m_Map.m_board)
-					{
-						for (auto & field : column)
-						{
-							if (emptyField == field.value)
-							{
-								fields.emplace_back(&field);
-							}
-						}
-					}
-					std::random_device r;
-					std::default_random_engine e1(r());
-					std::uniform_int_distribution<int> uniform_dist_width(0, fields.size() - 1);
-					fields[uniform_dist_width(e1)]->value = endSign;
-					currentField->value = emptyField;
-					m_Map.printMap();
-
-					return;
-				}
-				currentField->value = emptyField;
-				m_FieldStack.pop();
-				currentField = m_FieldStack.top();
-				//m_FieldStack.pop();
-				currentField->value = playerSign;
-				std::cout << "After popping " << *currentField << "\n";
-				availableFields = lookAround(currentField);
-	
-				m_Map.printMap();
+				pickRandomStart(currentField);
+				return;
 			}
-	
-			//return;
+			currentField->value = emptyField;
+			m_FieldStack.pop();
+			currentField = m_FieldStack.top();
+			currentField->value = playerSign;
+			logging::print("After popping " + currentField->toString());
+			availableFields = lookAround(currentField);
+
+			m_Map.printMap();
 		}
-		//availableFields.erase(std::remove(availableFields.begin(), availableFields.end(), m_FieldStack.top()), availableFields.end());
+
 		auto chosenDirection = chooseRandomDirection(availableFields);
-		std::cout << "Going " << convertMoveToString(chosenDirection) << "\n";
-		std::cout << "Field before: " << *currentField << "\n";
+		logging::print("Going " + convertMoveToString(chosenDirection));
+		logging::print("Field before: " + currentField->toString());
 		makeMove(currentField, chosenDirection);
-		std::cout << "Field after: " << *currentField << "\n";
+		logging::print("Field after: " + currentField->toString());
 
 		m_Map.printMap();
 		availableFields = lookAround(currentField);
 
-		if (availableFields.size() > 1)
-		{
-
-			std::cout << "availableFields.size(): " << availableFields.size() << "\n";
-			
-			//availableFields.erase(std::remove(availableFields.begin(), availableFields.end(), getOppositeMove(chosenDirection)), availableFields.end());
-			std::random_device r;
-			std::default_random_engine e1(r());
-			std::uniform_int_distribution<int> uniform_dist_width(0, availableFields.size()-1);
-			auto amount = uniform_dist_width(e1);
-			std::cout << "Amount: " << amount << "\n";
-			for (int i = 0; i < amount; ++i)
-			{
-				Field field = *currentField;
-				Field * filedPtr = &field;
-				std::cout << "Putting wall " << convertMoveToString(availableFields[i]) << "\n";
-
-				makeMove2(filedPtr, availableFields[i]);
-				filedPtr->value = borderSign;
-				filedPtr->isBorder = true;
-			}
-		}
+		decideAboutPuttingWalls(availableFields, currentField);
 
 		m_Map.printMap();
-		int x = 10;
 	}
 }
 
+void MapBuilder::decideAboutPuttingWalls(std::vector<Moves> & availableFields, Field * currentField)
+{
+	if (availableFields.size() > 1)
+	{
+		logging::print("availableFields.size(): " + availableFields.size());
+
+		auto amount = getRandomValue(availableFields.size() - 1);
+		logging::print("Amount: " + amount);
+		for (int i = 0; i < amount; ++i)
+		{
+			Field field = *currentField;
+			Field * filedPtr = &field;
+			logging::print("Putting wall " + convertMoveToString(availableFields[i]));
+
+			makeMove(filedPtr, availableFields[i], false);
+			filedPtr->value = borderSign;
+			filedPtr->isBorder = true;
+		}
+	}
+}
 
 void MapBuilder::generateStart()
 {
-	// Seed with a real random value, if available
-	std::random_device r;
-
-	std::default_random_engine e1(r());
-	std::uniform_int_distribution<int> uniform_dist_width(0, m_Map.getWidth() - 1);
-	Field start{ uniform_dist_width(e1), 0, startSign };
+	Field start{ getRandomValue(m_Map.getWidth() - 1), 0, startSign };
 
 	if (start.x == 0 || start.x == m_Map.getWidth() - 1)
 	{
-		std::uniform_int_distribution<int> uniform_dist_height(1, m_Map.getHeight() - 2);
-		start.y = uniform_dist_height(e1);
+		start.y = getRandomValue(m_Map.getHeight() - 2, 1);
 	}
 	else
 	{
-		std::uniform_int_distribution<int> uniform_dist_height(0, m_Map.getHeight() - 1);
-		start.y = uniform_dist_height(e1);
+		start.y = getRandomValue(m_Map.getHeight() - 1);
 	}
 
-	std::cout << "m_start_x: " << start.x << '\n';
-	std::cout << "m_start_y: " << start.y << '\n';
+	logging::print("m_start_x: " + start.x);
+	logging::print("m_start_y: " + start.y);
 
 	m_Map.setStart(std::move(start));
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include <boost/optional.hpp>
 #include "Map.h"
-#include <random>
+
 #include "pch.h"
 #include <cmath>
 #include <stack>
@@ -9,6 +9,11 @@
 class MapBuilder
 {
 public:
+	
+	void decideAboutPuttingWalls(std::vector<Moves> & availableFields, Field * currentField);
+
+	std::stack<Field*> m_FieldStack;
+	Map & m_Map;
 	enum Moves
 	{
 		Up,
@@ -17,33 +22,14 @@ public:
 		Right,
 		Amount
 	};
-	std::vector<std::string> movesString{"Up", "Down", "Left", "Right"};
-	Moves getOppositeMove(Moves move)
-	{
-		switch (move)
-		{
-		case Moves::Up:
-			return Moves::Down;
-		case Moves::Down:
-			return Moves::Up;
-		case Moves::Left:
-			return Moves::Right;
-		case Moves::Right:
-			return Moves::Left;
-		default:
-			return Moves::Amount;
-		}
-	}
-	std::string convertMoveToString(Moves move);
+	std::vector<std::string> movesString{ "Up", "Down", "Left", "Right" };
 
-	std::stack<Field*> m_FieldStack;
-	Map & m_Map;
+	std::string convertMoveToString(Moves move);
 	std::vector<std::function<void(Field*&)>> m_Moves;
 	std::vector<std::function<boost::optional<Moves>(Field*)>> m_Directions;
 
-	Field * makeMove(Field *& field, Moves where);
-	Field * makeMove2(Field *& field, Moves where);
-
+	Field * makeMove(Field *& field, Moves where, bool addToStack = true);
+	void pickRandomStart(Field * currentField);
 	void initializeDirections();
 
 	void initializeMoves();
@@ -51,7 +37,7 @@ public:
 	MapBuilder(Map &map);
 
 	std::vector<std::function<void(Map &, Field *)>>  m_MakeMove;
-	~MapBuilder() {};
+	~MapBuilder() = default;
 
 
 	void generateMap();
@@ -65,7 +51,6 @@ public:
 
 	void generate_(Map& map);
 	Moves chooseRandomDirection(std::vector<Moves> & availableMoves);
-	void temp(Field *& field, Moves where);
 
 	//void  lookAround();//const Map& map, const FieldType& field);
 	//One concern... maybe it would be better to have some other type of vector and then return vector which always has 4 elements

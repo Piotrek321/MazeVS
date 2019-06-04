@@ -4,7 +4,7 @@ struct Field
 {
 	Field(int x, int y, char value) : x(x), y(y), value(value) {}
 	Field(int x, int y) : x(x), y(y) {}
-	Field() { std::cout << "FIELD()\n\n\n"; }
+	Field() { }
 	Field(char value) :value(value) {}
 
 	bool operator==(const Field & other) const
@@ -18,9 +18,20 @@ struct Field
 
 	int x = 0;
 	int y = 0;
-	char value;
+	char value = ' ';
 	bool isBorder = false;
 	bool wasVisited = false;
+
+	std::string toString()
+	{
+		std::string result = "\nX : " + std::to_string(x) ;
+		result += " y: " + std::to_string(y);
+		result += "\nvalue " + std::to_string(value);
+		result += "\nisBorder " + std::to_string(isBorder);
+		result += "\nwasVisited " + std::to_string(wasVisited);
+		return result; 
+	}
+
 	friend std::ostream &operator << (std::ostream & os, const Field& field)
 	{
 

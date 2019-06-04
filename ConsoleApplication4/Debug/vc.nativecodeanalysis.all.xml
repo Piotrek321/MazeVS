@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?><DEFECTS><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\aaa123\source\repos\consoleapplication4\consoleapplication4</FILEPATH>
+      <FILENAME>field.h</FILENAME>
+      <LINE>6</LINE>
+      <COLUMN>1</COLUMN>
+    </SFA>
+    <DEFECTCODE>26495</DEFECTCODE>
+    <DESCRIPTION>Variable 'Field::value' is uninitialized. Always initialize a member variable (type.6).</DESCRIPTION>
+    <FUNCTION>Field::{ctor}</FUNCTION>
+    <DECORATED>??0Field@@QAE@HH@Z</DECORATED>
+    <FUNCLINE>6</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\aaa123\source\repos\consoleapplication4\consoleapplication4</FILEPATH>
+      <FILENAME>field.h</FILENAME>
+      <LINE>7</LINE>
+      <COLUMN>1</COLUMN>
+    </SFA>
+    <DEFECTCODE>26495</DEFECTCODE>
+    <DESCRIPTION>Variable 'Field::value' is uninitialized. Always initialize a member variable (type.6).</DESCRIPTION>
+    <FUNCTION>Field::{ctor}</FUNCTION>
+    <DECORATED>??0Field@@QAE@XZ</DECORATED>
+    <FUNCLINE>7</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\users\aaa123\source\repos\consoleapplication4\consoleapplication4</FILEPATH>
+      <FILENAME>map.cpp</FILENAME>
+      <LINE>5</LINE>
+      <COLUMN>5</COLUMN>
+    </SFA>
+    <DEFECTCODE>26495</DEFECTCODE>
+    <DESCRIPTION>Variable 'Map::m_end' is uninitialized. Always initialize a member variable (type.6).</DESCRIPTION>
+    <FUNCTION>Map::{ctor}</FUNCTION>
+    <DECORATED>??0Map@@QAE@HH@Z</DECORATED>
+    <FUNCLINE>5</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\program files\boost\boost_1_55_0\boost\optional</FILEPATH>
+      <FILENAME>optional.hpp</FILENAME>
+      <LINE>226</LINE>
+      <COLUMN>4</COLUMN>
+    </SFA>
+    <DEFECTCODE>26495</DEFECTCODE>
+    <DESCRIPTION>Variable 'boost::optional_detail::optional_base&lt;enum MapBuilder::Moves&gt;::m_storage' is uninitialized. Always initialize a member variable (type.6).</DESCRIPTION>
+    <FUNCTION>boost::optional_detail::optional_base&lt;enum MapBuilder::Moves&gt;::{ctor}</FUNCTION>
+    <DECORATED>??0?$optional_base@W4Moves@MapBuilder@@@optional_detail@boost@@IAE@ABW4Moves@MapBuilder@@@Z</DECORATED>
+    <FUNCLINE>226</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT><DEFECT>
+    <SFA>
+      <FILEPATH>c:\program files\boost\boost_1_55_0\boost\optional</FILEPATH>
+      <FILENAME>optional.hpp</FILENAME>
+      <LINE>220</LINE>
+      <COLUMN>4</COLUMN>
+    </SFA>
+    <DEFECTCODE>26495</DEFECTCODE>
+    <DESCRIPTION>Variable 'boost::optional_detail::optional_base&lt;enum MapBuilder::Moves&gt;::m_storage' is uninitialized. Always initialize a member variable (type.6).</DESCRIPTION>
+    <FUNCTION>boost::optional_detail::optional_base&lt;enum MapBuilder::Moves&gt;::{ctor}</FUNCTION>
+    <DECORATED>??0?$optional_base@W4Moves@MapBuilder@@@optional_detail@boost@@IAE@PQnone_helper@detail@2@H@Z</DECORATED>
+    <FUNCLINE>220</FUNCLINE>
+    <PATH></PATH>
+  </DEFECT></DEFECTS>

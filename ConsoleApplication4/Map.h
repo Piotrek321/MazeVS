@@ -31,7 +31,7 @@ public:
 
 	
 	void setStart(Field&& start);
-		void setEnd(Field end);
+	void setEnd(Field end);
 	int getHeight() const;
 	int getWidth() const;
 
