@@ -9,11 +9,6 @@
 class MapBuilder
 {
 public:
-	
-	void decideAboutPuttingWalls(std::vector<Moves> & availableFields, Field * currentField);
-
-	std::stack<Field*> m_FieldStack;
-	Map & m_Map;
 	enum Moves
 	{
 		Up,
@@ -22,17 +17,30 @@ public:
 		Right,
 		Amount
 	};
-	std::vector<std::string> movesString{ "Up", "Down", "Left", "Right" };
 
-	std::string convertMoveToString(Moves move);
-	std::vector<std::function<void(Field*&)>> m_Moves;
-	std::vector<std::function<boost::optional<Moves>(Field*)>> m_Directions;
+	class MoveMaker
+	{
+	public:
+		std::vector<std::string> movesString{ "Up", "Down", "Left", "Right" };
 
-	Field * makeMove(Field *& field, Moves where, bool addToStack = true);
-	void pickRandomStart(Field * currentField);
-	void initializeDirections();
+		std::string convertMoveToString(Moves move);
+		std::vector<std::function<void(Field*&)>> m_Moves;
+		std::vector<std::function<boost::optional<Moves>(Field*)>> m_Directions;
+		Field *& makeMove(Field *& field, Moves where, Map & m_Map);
+		void initializeMoves(Map & m_Map);
+		void initializeDirections(Map & m_Map);
+		bool isFieldValid(Field & field);
 
-	void initializeMoves();
+		
+	};
+
+	void decideAboutPuttingWalls(std::vector<Moves> & availableFields, Field * currentField);
+
+	std::stack<Field*> m_FieldStack;
+	Map & m_Map;
+
+		void pickRandomStart(Field * currentField);
+
 
 	MapBuilder(Map &map);
 
@@ -48,8 +56,6 @@ public:
 
 	void generateStart();
 
-
-	void generate_(Map& map);
 	Moves chooseRandomDirection(std::vector<Moves> & availableMoves);
 
 	//void  lookAround();//const Map& map, const FieldType& field);
@@ -58,5 +64,5 @@ public:
 	// i.e vector<optional<TYPE>> . Beause now it is harder to test. You have to remeber what the output of fc will be
 	auto lookAround(Field* field);
 
-
+	MoveMaker moveMaker;
 };

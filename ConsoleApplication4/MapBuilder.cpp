@@ -1,101 +1,11 @@
 #include "MapBuilder.h"
 #include "Logger.h"
 
-std::string MapBuilder::convertMoveToString(Moves move)
-{
-	return movesString[move];
-}
-
-Field * MapBuilder::makeMove(Field *& field, Moves where, bool addToStack)
-{
-	if (field != m_Map.getStart())
-	{
-		field->value = emptyField;
-	}
-	m_Moves[where](field);
-	field->value = playerSign;
-	field->wasVisited = true;
-	if (addToStack)
-	{
-		m_FieldStack.push(field);
-	}
-	return field;
-}
-
-void MapBuilder::initializeDirections()
-{
-	m_Directions.reserve(Moves::Amount);
-
-	m_Directions.emplace_back([&map = this->m_Map](Field * field)->boost::optional<Moves>
-	{
-		if (!(field->y <= 0 || map.m_board[field->y - step][field->x].isBorder == true || map.m_board[field->y - step][field->x].wasVisited == true))
-		{
-			return Moves::Up;
-		}
-		return boost::none;
-	});
-
-	m_Directions.emplace_back([&map = this->m_Map](Field * field)->boost::optional<Moves>
-	{
-		if (!(field->y + step >= map.getHeight() || map.m_board[field->y + step][field->x].isBorder == true || map.m_board[field->y + step][field->x].wasVisited == true))
-		{
-			return Moves::Down;
-		}
-		return boost::none;
-	});
-
-	m_Directions.emplace_back([&map = this->m_Map](Field * field)->boost::optional<Moves>
-	{
-		if (!(field->x - step < 0 || map.m_board[field->y][field->x - step].isBorder == true || map.m_board[field->y][field->x - step].wasVisited == true))
-		{
-			return Moves::Left;
-		}
-		return boost::none;
-	});
-
-	m_Directions.emplace_back([&map = this->m_Map](Field * field)->boost::optional<Moves>
-	{
-		if (!(field->x + step >= map.getWidth() || map.m_board[field->y][field->x + step].isBorder == true || map.m_board[field->y][field->x + step].wasVisited == true))
-		{
-			return Moves::Right;
-		}
-		return boost::none;
-	});
-}
-
-void MapBuilder::initializeMoves()
-{
-	m_Moves.reserve(Moves::Amount);
-
-	//UP
-	m_Moves.emplace_back([this](Field *& field)
-	{
-		field = &m_Map.m_board[field->y - step][field->x];
-	});
-
-	//DOWN
-	m_Moves.emplace_back([this](Field *& field)
-	{
-		field = &m_Map.m_board[field->y + step][field->x];
-	});
-
-	//LEFT
-	m_Moves.emplace_back([this](Field *& field)
-	{
-		field = &m_Map.m_board[field->y][field->x - step];
-	});
-
-	//RIGHT
-	m_Moves.emplace_back([this](Field *& field)
-	{
-		field = &m_Map.m_board[field->y][field->x + step];
-	});
-}
 
 MapBuilder::MapBuilder(Map &map) : m_Map(map)
 {
-	initializeMoves();
-	initializeDirections();
+	moveMaker.initializeMoves(map);
+	moveMaker.initializeDirections(map);
 }
 
 MapBuilder::Moves MapBuilder::chooseRandomDirection(std::vector<Moves> & availableMoves)
@@ -112,13 +22,13 @@ auto MapBuilder::lookAround(Field* field)
 	std::vector<Moves> availableMoves;
 	logging::print("Available moves:");
 
-	for (const auto & direction : m_Directions)
+	for (const auto & direction : moveMaker.m_Directions)
 	{
 		const auto & direction_ = direction(field);
 		if (direction_)
 		{
 			availableMoves.emplace_back(direction_.get());
-			logging::print(convertMoveToString(direction_.get()) + " ");
+			logging::print(moveMaker.convertMoveToString(direction_.get()) + " ");
 		}
 	}
 	logging::print("\n");
@@ -177,9 +87,9 @@ void MapBuilder::generateMap()
 		}
 
 		auto chosenDirection = chooseRandomDirection(availableFields);
-		logging::print("Going " + convertMoveToString(chosenDirection));
+		logging::print("Going " + moveMaker.convertMoveToString(chosenDirection));
 		logging::print("Field before: " + currentField->toString());
-		makeMove(currentField, chosenDirection);
+		m_FieldStack.push(moveMaker.makeMove(currentField, chosenDirection, m_Map));
 		logging::print("Field after: " + currentField->toString());
 
 		m_Map.printMap();
@@ -203,9 +113,9 @@ void MapBuilder::decideAboutPuttingWalls(std::vector<Moves> & availableFields, F
 		{
 			Field field = *currentField;
 			Field * filedPtr = &field;
-			logging::print("Putting wall " + convertMoveToString(availableFields[i]));
+			logging::print("Putting wall " + moveMaker.convertMoveToString(availableFields[i]));
 
-			makeMove(filedPtr, availableFields[i], false);
+			moveMaker.makeMove(filedPtr, availableFields[i], m_Map);
 			filedPtr->value = borderSign;
 			filedPtr->isBorder = true;
 		}
@@ -230,3 +140,115 @@ void MapBuilder::generateStart()
 
 	m_Map.setStart(std::move(start));
 }
+
+
+std::string MapBuilder::MoveMaker::convertMoveToString(Moves move)
+{
+	return movesString[move];
+}
+
+Field *& MapBuilder::MoveMaker::makeMove(Field *& field, Moves where, Map & m_Map)
+{
+	if (field != m_Map.getStart())
+	{
+		field->value = emptyField;
+	}
+	m_Moves[where](field);
+	field->value = playerSign;
+	field->wasVisited = true;
+
+	return field;
+}
+
+void MapBuilder::MoveMaker::initializeMoves(Map & m_Map)
+{
+	m_Moves.reserve(Moves::Amount);
+
+	//UP
+	m_Moves.emplace_back([&m_Map](Field *& field)
+	{
+		field = &m_Map.m_board[field->y - step][field->x];
+	});
+
+	//DOWN
+	m_Moves.emplace_back([&m_Map](Field *& field)
+	{
+		field = &m_Map.m_board[field->y + step][field->x];
+	});
+
+	//LEFT
+	m_Moves.emplace_back([&m_Map](Field *& field)
+	{
+		field = &m_Map.m_board[field->y][field->x - step];
+	});
+
+	//RIGHT
+	m_Moves.emplace_back([&m_Map](Field *& field)
+	{
+		field = &m_Map.m_board[field->y][field->x + step];
+	});
+}
+	void MapBuilder::MoveMaker::initializeDirections(Map &m_Map)
+	{
+		m_Directions.reserve(Moves::Amount);
+
+		m_Directions.emplace_back([&m_Map, this](Field * field)->boost::optional<Moves>
+		{
+			if (field->y - step >= 0)
+			{
+				Field & nextField = m_Map.m_board[field->y - step][field->x];
+				if (isFieldValid(nextField))
+				{
+					return Moves::Up;
+				}
+			}
+			return boost::none;
+		});
+
+		m_Directions.emplace_back([&m_Map, this](Field * field)->boost::optional<Moves>
+		{
+			
+			if (field->y + step < m_Map.getHeight())
+			{
+				Field & nextField = m_Map.m_board[field->y + step][field->x];
+				if (isFieldValid(nextField))
+				{
+					return Moves::Down;
+				}
+			}
+			return boost::none;
+		});
+
+		m_Directions.emplace_back([&m_Map, this](Field * field)->boost::optional<Moves>
+		{
+			if (field->x - step >= 0)
+			{
+				Field & nextField = m_Map.m_board[field->y][field->x - step];
+
+				if (isFieldValid(nextField))
+				{
+					return Moves::Left;
+				}
+			}
+			return boost::none;
+		});
+
+		m_Directions.emplace_back([&m_Map, this](Field * field)->boost::optional<Moves>
+		{
+			if (field->x + step < m_Map.getWidth())
+			{
+				Field & nextField = m_Map.m_board[field->y][field->x + step];
+				if (isFieldValid(nextField))
+				{
+					return Moves::Right;
+				}
+			}
+			return boost::none;
+		});
+	}
+
+	bool MapBuilder::MoveMaker::isFieldValid(Field & field)
+	{
+		return !(field.isBorder == true || field.wasVisited == true);
+	}
+
